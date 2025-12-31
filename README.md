@@ -1,19 +1,11 @@
-# Concentrated Portfolio Selection with Mean–Greedy–Matrix (MG) Model
+# Concentrated Portfolio Selection Model (Mean–Greedy Method)
 
-This repository implements a concentrated portfolio selection model based on the mean–greedy–matrix (MG) risk measure, and compares it against the classic mean–variance (MV) framework on U.S. and Chinese equity markets. 
+## Overview 
+This repository contains my class project with Ziyue Shi. We reproduced the portfolio selection method based on the greedy matrix introduced in [Chen et al., 2014](#chen2014) in R, applied it to the U.S. and Chinese equity markets, and extends the optimization process with a modern non-convex optimizer (Gurobi).
+
+## Methodology
 
 
-The project reproduces and extends the empirical study of Chen, Li, and Wang (2014) on concentrated portfolios, using updated data and a modern non-convex optimizer (Gurobi).
-
-1. Project Overview
-
-Traditional portfolio models such as mean–variance (MV), mean–semivariance (M-SV), and mean–CVaR (M-CVaR) typically select well-diversified portfolios. In practice, however, investors often hold concentrated portfolios due to:
-
-High transaction costs or indivisible positions (e.g., households).
-
-Limited supply of truly “good” stocks and a preference to focus on a few winners.
-
-Strategic reasons (e.g., avoiding benchmark-like diversification).
 
 To meet this need, the mean–greedy–matrix (MG) model introduces a new risk measure that explicitly captures investors’ greedy psychology:
 
@@ -21,7 +13,7 @@ To meet this need, the mean–greedy–matrix (MG) model introduces a new risk m
 
 As a result, MG naturally selects few, strongly performing assets while remaining computationally tractable.
 
-2. Methodology
+
 2.1 Mean–Greedy–Matrix Risk Measure
 
 For a portfolio weight vector 
