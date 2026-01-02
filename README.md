@@ -49,24 +49,39 @@ $$
 \end{aligned}
 $$
 
-As well as an actual investment environment with more assumptions are added:
+As well as an actual investment environment with transaction cost $c_i = k_i w_i$ and divident yield $d_i$. We require a target return and limit on the weights and transaction costs.
 
 $$
 \begin{aligned}
 \min_w & w' G w \\
-\text{s.t.} & \sum_{i=1}^N w_i \bar{r_i} = e \\
-& \sum_{i=1}^N w_i = 1, \quad w_i \ge 0
+\text{s.t.} 
+& E[r(w)] = \sum_{i=1}^N (\bar{r_i}+\bar{d_i})w_i - \sum_{i=1}^N c_i= e \\
+& c_i \ge k_i w_i \\
+& \sum_{i=1}^N c_i \le \gamma \\
+& \sum_{i=1}^N w_i = 1 \\
+& w_l \le w_i \le w_u, \quad i=1,...,N
 \end{aligned}
 $$
 
-Note that this is a non-convex process
+Note that both models are nonconvex optimization problems, as $G$ is indefinite. But the quadratic objective can be written as the difference of two convex functions, thus a DC algorithm (DCA) can be applied and is guaranteed (under standard assumptions) to converge to a DC-critical point:
 
+$$ w'Gw = w' \Sigma w - 2 w' \Delta w, \quad \Delta = diag(\sigma_{11}^+, \ldots , \sigma_{NN}^+) $$
 
+And for small-scale instances (which is the case in our empirical study), a global optimal portfolio can be efficiently obtained by the CP/DNN-based global QP optimization algorithm introduced in [Chen & Burer (2012)](#chen2012). The authors’ implementation is available at [QuadprogBB](https://github.com/sburer/QuadProgBB).
 
+However, since the public QuadProgBB code is written for older 32-bit Matlab/CPLEX environments and is difficult to run reliably on a modern 64-bit setup, we decided to used the commercial optimizer **Gurobi**, via its [R interface](https://www.gurobi.com/documentation/9.5/refman/r_api_overview.html). It also relies on a spatial branch-and-bound framework similar in spirit to Chen & Burer’s method, but with QP/LP-based convex relaxations instead of CP/DNN, bringing several practical advantages in our setting: 
+- It provides an easy-to-use R package and a clear documentation, and is effectively free for many university-affiliated users via an academic license.
+- For portfolio selection purposes, cheap computation and short running times are more important than extremely tight optimality gaps. Gurobi allows us to explicitly control the optimality tolerance (e.g., via `MIPGap` and time limits).
+- It can handle a wide range of problem classes (e.g., MILP, MIQP, QCP), making it convenient to extend the MG framework to more realistic settings with additional linear or mixed-integer constraints.
 
 ---
 
 ## Algorithm & Implementation
+
+
+
+
+
 
 ---
 
@@ -84,9 +99,11 @@ Note that this is a non-convex process
 
 ## References
 <a id="chen2014"></a>
-**Chen, Z., Li, Z., & Wang, L. (2014).** 
-Concentrated portfolio selection models based on historical data. 
+**Chen, Z., Li, Z., & Wang, L. (2014).**  
+Concentrated portfolio selection models based on historical data.  
 *Applied Stochastic Models in Business and Industry*, 31(5), 649–668.
 
-
-Rockafellar, R. T., & Uryasev, S. (2000). Optimization of conditional value-at-risk. Journal of Risk, 2, 21–41.
+<a id="chen2012"></a>
+**Chen J. and Burer S. (2012).**  
+Globally solving nonconvex quadratic programming problems via completely positive programming. 
+*Mathematical programming Computation*, 4(1), 33–52.
