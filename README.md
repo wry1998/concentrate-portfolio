@@ -183,17 +183,35 @@ Empirical results are applied on American (2011-03-30 to 2011-10-13) and Chinese
 -	A high transaction cost will not affect the performance of MG portfolios, which is another advantage compared to the mean-variance algorithm
 -	A “greedy choice” of target return generally doesn’t improve portfolio performance
 
-*Note: the time period and stock contents are slightly different from those in the original paper because of data quality issues.*
+*Note: Data were downloaded from yahoo finance. The time period and stock contents are slightly different from those in the original paper because of data quality issues.*
 
 ---
 
 ## Repository Structure
-
-
+```text
+.
+├── 01_Program/                     # R implementation of the mean-greedy model
+│   ├── 01_Model_Setup.R            # Functions to set up the simple and realistic mean-greedy models
+│   ├── 02_Supporting_Functions.R   # Supporting functions such as reading data from csv files, calculate the statistics, etc.
+│   └── 03_Empirical_Results.R      # Compute optimal portfolio and evaluate it's performance
+│
+├── 02_Data/                        # Data folder
+│   ├── Testing/                    # Data used for testing
+│       ├── American/               # Stocks from American stock market, both stock prices and dividents
+│       └── Chinese/                # Stocks Chinese stock market, both stock prices and dividents
+│   └── Training/                   # Data used for training
+│       ├── American/               # Stocks from American stock market, both stock prices and dividents
+│       └── Chinese/                # Stocks Chinese stock market, both stock prices and dividents
+│           
+├── 04_report/                       
+│   └── report.pdf                  # Final report
+│ 
+└── README.md
+```
 
 ---
 
-## Retrospective note on the empirical results
+## Retrospective Note on Empirical Results
 
 At the time when this project was originally completed in 2021, the empirical design closely followed the **out-of-sample setup** in [Chen, Li & Wang (2014)](#chen2014): optimal portfolios are estimated on a long in-sample window using the entire sample period except the last 5/10 trading days, and then evaluated out-of-sample over a single short block of 5/10 trading days. In hindsight, this evaluation protocol is **statistically very weak**:
 
@@ -212,5 +230,5 @@ Concentrated portfolio selection models based on historical data.
 
 <a id="chen2012"></a>
 **Chen J. and Burer S. (2012).**  
-Globally solving nonconvex quadratic programming problems via completely positive programming. 
+Globally solving nonconvex quadratic programming problems via completely positive programming.  
 *Mathematical programming Computation*, 4(1), 33–52.
