@@ -76,24 +76,131 @@ However, since the public QuadProgBB code is written for older 32-bit Matlab/CPL
 
 ---
 
-## Algorithm & Implementation
+## Implementation
+Below is a sample R code on how to build the simple and realistic models, more information on [R interface](https://www.gurobi.com/documentation/9.5/refman/r_api_overview.html):
 
+```
+library(Gurobi)
 
+## build model
+model = list()
+model$Q = Q                  ## the quadratic objective w'Qw
+model$A = A                  ## the linear constraint Aw %sense% b
+model$sense = c('=','<','>') ## the linear constraint Aw %sense% b
+model$rhs = b                ## the linear constraint Aw %sense% b
+model$lb = l                 ## lower bound for w
+model$ub = u                 ## upper bound for w
 
+## setup parameters
+params = list()
+params$method = 2            ## solving algorithm to use
+params$NonConvex = 2         ## programming type
 
+## optimal portfolio
+weight = gurobi(model, params)$x[1:N]
+```
+
+Simple model:
+
+$$Q = G$$
+
+$$
+\begin{bmatrix} 
+\bar{r_1} & \dots & \bar{r_N} \\ 
+1 & \dots & 1
+\end{bmatrix}
+\begin{bmatrix}
+w_1 \\
+\dots \\
+w_N
+\end{bmatrix} 
+\begin{bmatrix}
+= \\
+\=
+\end{bmatrix}
+\begin{bmatrix}
+e \\
+1
+\end{bmatrix}
+$$
+
+Realistic Model:
+
+$$ Q =
+\begin{bmatrix}
+G & 0 \dots 0 \\
+0 \dots 0 & 0 \dots 0
+\end{bmatrix}
+$$
+
+$$
+\begin{bmatrix}
+r_1+d_1 & \dots & r_N+d_N & -1 & \dots & -1 \\
+1 & \dots & 1 & 0 & \dots & 0 \\
+0 & \dots & 0 & 1 & \dots & 1 \\
+-k_1 & \dots & 0 & 1 & \dots & 0 \\
+\dots & \dots & \dots & \dots & \dots & \dots \\
+0 & -k_i & 0 & 0 & 1 & 0 \\
+\dots & \dots & \dots & \dots & \dots & \dots \\
+0 & \dots & -k_N & 0 & \dots & 1
+\end{bmatrix}
+\begin{bmatrix}
+w_1 \\
+\dots \\
+w_N \\
+c_1 \\
+\dots \\
+c_N
+\end{bmatrix} 
+\begin{bmatrix}
+= \\
+= \\
+<= \\
+\>= \\
+\dots \\
+\>=
+\end{bmatrix} 
+\begin{bmatrix}
+1 \\
+e \\
+\gamma \\
+0 \\
+\dots \\
+0
+\end{bmatrix} 
+$$
 
 
 ---
 
 ## Empirical Findings
 
+Empirical results are applied on American (2011-03-30 to 2011-10-13) and Chinese stock market (2009-01-13 to 2011-07-01), and optimal portfolios are evaluated by their out-of-sample performance. Return, standard deviation, CVaR, and Famelli-Tibiletti ratio are used to evaluate portfolio performance, while zero-norm and Herfindahl index are used to evaluate portfolio diversification. We observed the following:
 
+-	Portfolios selected by concentrate algorithm is much more concentrated than portfolios selected by mean-variance algorithm with much less stocks selected and a higher individual weights, due to the concentrate nature of G
+-	Low diversification is not necessarily associated with poor performance, as MG portfolios in general outperform MV portfolios. This is consistent with real world market structure that most indices are highly concentrated in a few dominate stocks
+-	To limit the weight of individual stocks has a positive effect on Chinese Market while a negative effect on American Market, as Chinese stock market is more policy driven and regime dependent, and head-stock dominance is less stable
+-	A high transaction cost will not affect the performance of MG portfolios, which is another advantage compared to the mean-variance algorithm
+-	A “greedy choice” of target return generally doesn’t improve portfolio performance
+
+*Note: the time period and stock contents are slightly different from those in the original paper because of data quality issues.*
 
 ---
 
 ## Repository Structure
 
 
+
+---
+
+## Retrospective note on the empirical results
+
+At the time when this project was originally completed in 2021, the empirical design closely followed the **out-of-sample setup** in [Chen, Li & Wang (2014)](#chen2014): optimal portfolios are estimated on a long in-sample window using the entire sample period except the last 5/10 trading days, and then evaluated out-of-sample over a single short block of 5/10 trading days. In hindsight, this evaluation protocol is **statistically very weak**:
+
+- Using only 5–10 daily observations to compute expected returns and risk measures provides almost no robust information about true model performance.
+- Any apparent performance differences across models over such a short horizon could easily be driven by noise or by the specific choice of data, rather than by a genuinely superior strategy.
+
+Thus, if I were to revisit this topic today, I would prefer a **rolling window scheme** over the simple out-of-sample setup, in order to obtain more reliable performance statistics and to reduce sample-selection effects. 
 
 ---
 
