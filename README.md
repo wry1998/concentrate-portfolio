@@ -1,5 +1,5 @@
 # Concentrated Portfolio Selection Model (Mean–Greedy Method)
-This repository contains the code and report for a two-person Master’s course project at the University of Waterloo. We replicate and extend the **concentrated portfolio selection** method of [Chen, Li & Wang (2014)](#chen2014), and compare it against the classic **mean–variance (MV)** model on U.S. and Chinese equity markets.
+This repository contains the code and report for a master’s course project at University of Waterloo. We replicate and extend the **concentrated portfolio selection** method of [Chen, Li & Wang (2014)](#chen2014), and compare it against the classic **mean–variance (MV)** model on U.S. and Chinese equity markets.
 
 The project implements both the **simple** and the **realistic** versions of the **mean–greedy (MG)** model in R, and evaluates their performance using daily stock returns for U.S. and A-share markets.
 
@@ -24,7 +24,7 @@ It treats all volatility as risk and naturally prefers **well-diversified** port
 - They are mainly afraid of **downside moves**.
 - They often hold **concentrated portfolios** containing a few “star” stocks instead of a well-diversified portfolio.
 
-Thus, [Chen, Li & Wang (2014)](#chen2014) proposed a new risk measure that explicitly distinguishes **upside deviation** from **downside deviation**, leading to an adjusted covariance matrix called the **greedy matrix (G)**:
+Thus, [Chen, Li & Wang (2014)](#chen2014) proposed a new risk measure that distinguishes **upside deviation** from **downside deviation**, leading to an adjusted covariance matrix called the **greedy matrix (G)**:
 
 $$
 \begin{aligned}
@@ -36,7 +36,7 @@ g_{ij} =
 \end{aligned}
 $$
 
-This modification to diagonal elements of the covariance matrix reflects investors’ greedy psychology of wanting the upside deviation as large as possible and the downside deviation as small as possible, as well as describes the rule of minimizing risk more naturally in practice: the smaller the risk value is, the better the portfolio performs. And it naturally produces concentrated portfolios without explicit cardinality constraints by assigning large weights to the few good stocks with negative “variance” ($\sigma_{ii}^+ > \sigma_{ii}^-$).
+This modification to the diagonal elements of the covariance matrix reflects investors’ greedy psychology of wanting the upside deviation as large as possible and the downside deviation as small as possible. It also describes the rule of minimizing risk more naturally in practice: the smaller the risk value is, the better the portfolio performs. And it naturally produces concentrated portfolios by assigning large weights to the few good stocks with negative “variance” ($\sigma_{ii}^+ > \sigma_{ii}^-$).
 
 The mean-greedy method is then built under a simplified environment that only requires on target return:
 
@@ -69,15 +69,15 @@ $$ w'Gw = w' \Sigma w - 2 w' \Delta w, \quad \Delta = diag(\sigma_{11}^+, \ldots
 
 And for small-scale instances (which is the case in our empirical study), a global optimal portfolio can be efficiently obtained by the CP/DNN-based global QP optimization algorithm introduced in [Chen & Burer (2012)](#chen2012). The authors’ implementation is available at [QuadprogBB](https://github.com/sburer/QuadProgBB).
 
-However, since the public QuadProgBB code is written for older 32-bit Matlab/CPLEX environments and is difficult to run reliably on a modern 64-bit setup, we decided to used the commercial optimizer **Gurobi**, via its [R interface](https://www.gurobi.com/documentation/9.5/refman/r_api_overview.html). It also relies on a spatial branch-and-bound framework similar in spirit to Chen & Burer’s method, but with QP/LP-based convex relaxations instead of CP/DNN, bringing several practical advantages in our setting: 
-- It provides an easy-to-use R package and a clear documentation, and is effectively free for many university-affiliated users via an academic license.
-- For portfolio selection purposes, cheap computation and short running times are more important than extremely tight optimality gaps. Gurobi allows us to explicitly control the optimality tolerance (e.g., via `MIPGap` and time limits).
-- It can handle a wide range of problem classes (e.g., MILP, MIQP, QCP), making it convenient to extend the MG framework to more realistic settings with additional linear or mixed-integer constraints.
+However, since the public QuadProgBB code is written for older 32-bit Matlab/CPLEX environments and is difficult to run on 64-bit, we use the commercial optimizer **Gurobi** via its [R interface](https://www.gurobi.com/documentation/9.5/refman/r_api_overview.html). Gurobi also relies on a spatial branch-and-bound framework similar in spirit to Chen & Burer’s method, but with QP/LP-based convex relaxations instead of CP/DNN. It brings several practical advantages in our setting: 
+- It provides an easy-to-use R package and a clear documentation.
+- For portfolio selection purposes, cheap computation and short running times are more important than extremely tight optimality gaps. Gurobi allows us to control the optimality tolerance via `MIPGap` and time limits.
+- It can handle a wide range of optimization problems (e.g., MILP, MIQP, QCP), making it convenient to extend the MG framework to more realistic settings with additional constraints.
 
 ---
 
 ## Implementation
-Below is a sample R code on how to build the simple and realistic models, more information on [R interface](https://www.gurobi.com/documentation/9.5/refman/r_api_overview.html):
+Below is a sample R code on how to build the simple and realistic models, more information can be found on [R interface](https://www.gurobi.com/documentation/9.5/refman/r_api_overview.html):
 
 ```
 library(Gurobi)
@@ -175,15 +175,15 @@ $$
 
 ## Empirical Findings
 
-Empirical results are applied on American (2011-03-30 to 2011-10-13) and Chinese stock market (2009-01-13 to 2011-07-01), and optimal portfolios are evaluated by their out-of-sample performance. Return, standard deviation, CVaR, and Famelli-Tibiletti ratio are used to evaluate portfolio performance, while zero-norm and Herfindahl index are used to evaluate portfolio diversification. We observed the following:
+Both simple and realistic models are applied on American (2011-03-30 to 2011-10-13) and Chinese stock market (2009-01-13 to 2011-07-01). Return, standard deviation, CVaR, and Famelli-Tibiletti ratio are used to evaluate portfolio performance; zero-norm and Herfindahl index are used to evaluate portfolio diversification. We observed the following:
 
--	Portfolios selected by concentrate algorithm is much more concentrated than portfolios selected by mean-variance algorithm with much less stocks selected and a higher individual weights, due to the concentrate nature of G
--	Low diversification is not necessarily associated with poor performance, as MG portfolios in general outperform MV portfolios. This is consistent with real world market structure that most indices are highly concentrated in a few dominate stocks
--	To limit the weight of individual stocks has a positive effect on Chinese Market while a negative effect on American Market, as Chinese stock market is more policy driven and regime dependent, and head-stock dominance is less stable
--	A high transaction cost will not affect the performance of MG portfolios, which is another advantage compared to the mean-variance algorithm
--	A “greedy choice” of target return generally doesn’t improve portfolio performance
+-	Portfolios selected by mean-greedy algorithm is much more concentrated than portfolios selected by mean-variance algorithm. Much less stocks are selected with higher individual weights, due to the concentrate nature of $G$.
+-	Low diversification is not necessarily associated with poor performance, as MG portfolios in general outperform MV portfolios. This is consistent with real world market structure that most indices are highly concentrated in a few dominate stocks.
+-	Limiting the weight of individual stocks has a positive effect on Chinese Market while a negative effect on American Market, as Chinese stock market is more policy-driven, and head-stock dominance is less stable.
+-	A high transaction cost will not affect the performance of MG portfolios, which is another advantage compared to the mean-variance algorithm.
+-	A “greedy choice” of target return generally doesn’t improve portfolio performance.
 
-*Note: Data were downloaded from yahoo finance. The time period and stock contents are slightly different from those in the original paper because of data quality issues.*
+*Note that data were downloaded from yahoo finance. The time period and stock contents are slightly different from those in the original paper because of data quality issues.*
 
 ---
 
@@ -213,12 +213,9 @@ Empirical results are applied on American (2011-03-30 to 2011-10-13) and Chinese
 
 ## Retrospective Note on Empirical Results
 
-At the time when this project was originally completed in 2021, the empirical design closely followed the **out-of-sample setup** in [Chen, Li & Wang (2014)](#chen2014): optimal portfolios are estimated on a long in-sample window using the entire sample period except the last 5/10 trading days, and then evaluated out-of-sample over a single short block of 5/10 trading days. In hindsight, this evaluation protocol is **statistically very weak**:
+At the time when this project was originally completed in 2021, the empirical design closely followed the out-of-sample setup in [Chen, Li & Wang (2014)](#chen2014): optimal portfolios are estimated using the entire sample period except the last 5/10 trading days, and then evaluated out-of-sample over a single short block of 5/10 trading days. This setting is **statistically very weak**, as using only 5–10 daily observations to compute expected returns and risk measures provides almost no robust information about true model performance. Results could easily be driven by noise or by the specific choice of data, rather than by a genuinely superior strategy.
 
-- Using only 5–10 daily observations to compute expected returns and risk measures provides almost no robust information about true model performance.
-- Any apparent performance differences across models over such a short horizon could easily be driven by noise or by the specific choice of data, rather than by a genuinely superior strategy.
-
-Thus, if I were to revisit this topic today, I would prefer a **rolling window scheme** over the simple out-of-sample setup, in order to obtain more reliable performance statistics and to reduce sample-selection effects. 
+Thus, if I were to revisit this topic today, I would prefer a **rolling-window setup** over the simple out-of-sample setup, in order to obtain more reliable performance statistics and to reduce sample-selection effects. 
 
 ---
 
