@@ -3,7 +3,7 @@ This repository contains the code and report for a master’s course project at 
 
 The project implements both the **simple** and the **realistic** versions of the **mean–greedy (MG)** model in R, and evaluates their performance using daily stock returns for U.S. and A-share markets.
 
-> Note: This was a joint project with a teammate. This repo hosts my implementation and the final report we submitted for the course.
+> This was a joint project with a teammate. This repo hosts my implementation and the final report we submitted for the course.
 
 ---
 
