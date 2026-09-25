@@ -1,5 +1,5 @@
 # Concentrated Portfolio Selection Model (Mean–Greedy Method)
-This repository contains the code and report for a master’s course project at University of Waterloo. I replicated and extended the **concentrated portfolio selection** method of [Chen, Li & Wang (2014)](#chen2014), and compared it against the classic **mean–variance (MV)** model on U.S. and Chinese equity markets.
+This repository contains the code and report for a master’s course project at University of Waterloo, where I replicated and extended the **concentrated portfolio selection** method of [Chen, Li & Wang (2014)](#chen2014). This project was supervised by Professor David Saunders.
 
 > This was a joint project with a teammate. This repo hosts my implementation and the final report we submitted for the course.
 
