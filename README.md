@@ -1,7 +1,5 @@
 # Concentrated Portfolio Selection Model (Mean–Greedy Method)
-This repository contains the code and report for a master’s course project at University of Waterloo. We replicate and extend the **concentrated portfolio selection** method of [Chen, Li & Wang (2014)](#chen2014), and compare it against the classic **mean–variance (MV)** model on U.S. and Chinese equity markets.
-
-The project implements both the **simple** and the **realistic** versions of the **mean–greedy (MG)** model in R, and evaluates their performance using daily stock returns for U.S. and A-share markets.
+This repository contains the code and report for a master’s course project at University of Waterloo. I replicated and extended the **concentrated portfolio selection** method of [Chen, Li & Wang (2014)](#chen2014), and compared it against the classic **mean–variance (MV)** model on U.S. and Chinese equity markets.
 
 > This was a joint project with a teammate. This repo hosts my implementation and the final report we submitted for the course.
 
@@ -229,3 +227,6 @@ Concentrated portfolio selection models based on historical data.
 **Chen J. and Burer S. (2012).**  
 Globally solving nonconvex quadratic programming problems via completely positive programming.  
 *Mathematical programming Computation*, 4(1), 33–52.
+
+---
+*For an overview of my research projects, see my [research portfolio](https://github.com/wry1998/research-portfolio).*
